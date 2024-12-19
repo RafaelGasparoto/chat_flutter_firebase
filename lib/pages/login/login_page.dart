@@ -10,7 +10,9 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  final TextEditingController controller = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
@@ -18,17 +20,23 @@ class _LoginPageState extends State<LoginPage> {
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 15),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              CustomFormField(controller: controller, labelText: 'E-mail', padding: const EdgeInsets.only(bottom: 10)),
-              CustomFormField(controller: controller, labelText: 'Senha'),
-              const CustomButton(
-                label: 'Login',
-                padding: EdgeInsets.symmetric(vertical: 10),
-              )
-            ],
+          child: Form(
+            key: _formKey,
+            autovalidateMode: AutovalidateMode.always,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                CustomFormField(controller: emailController, labelText: 'E-mail', padding: const EdgeInsets.only(bottom: 10)),
+                CustomFormField(controller: passwordController, labelText: 'Senha'),
+                CustomButton(
+                  label: 'Login',
+                  onPressed: () {
+
+                  },
+                ),
+              ],
+            ),
           ),
         ),
       ),
