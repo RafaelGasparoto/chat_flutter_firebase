@@ -1,18 +1,19 @@
 import 'package:flutter/material.dart';
 
 class CustomButton extends StatelessWidget {
-  const CustomButton({super.key, 
+  const CustomButton({
+    super.key,
+    this.padding,
     required this.label,
-    required this.padding,
   });
 
   final String label;
-  final EdgeInsets padding;
+  final EdgeInsets? padding;
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: padding,
+      padding: padding ?? const EdgeInsets.all(0),
       child: LayoutBuilder(
         builder: (context, constraints) => ElevatedButton(
           onPressed: () {},
