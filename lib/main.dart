@@ -1,3 +1,4 @@
+import 'package:chat_flutter_firebase/services/auth_service.dart';
 import 'package:chat_flutter_firebase/services/navigation_service.dart';
 import 'package:chat_flutter_firebase/utils/firebase_setup.dart';
 import 'package:chat_flutter_firebase/utils/register_services.dart';
@@ -6,8 +7,7 @@ import 'package:get_it/get_it.dart';
 
 Future<void> main() async {
   await setup();
-  final NavigationService navigationService = GetIt.instance.get<NavigationService>();
-  runApp(MyApp(navigationService));
+  runApp(MyApp());
 }
 
 Future<void> setup() async {
@@ -17,17 +17,18 @@ Future<void> setup() async {
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp(this._navigationService, {super.key});
+  const MyApp({super.key});
 
-  final NavigationService _navigationService; 
- 
   @override
   Widget build(BuildContext context) {
+    final NavigationService navigationService = GetIt.instance.get<NavigationService>();
+    final AuthService authService = GetIt.instance.get<AuthService>();
+
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      navigatorKey: _navigationService.navigatorKey,
-      routes: _navigationService.routes,
-      initialRoute: '/login',
+      navigatorKey: navigationService.navigatorKey,
+      routes: navigationService.routes,
+      initialRoute: authService.user != null ? '/home' : '/login',
       title: 'Chat Flutter Firebase',
       theme: ThemeData(
         colorScheme: const ColorScheme.light(),
