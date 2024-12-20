@@ -1,3 +1,4 @@
+import 'package:chat_flutter_firebase/utils/regex.dart';
 import 'package:chat_flutter_firebase/widgets/custom_button.dart';
 import 'package:chat_flutter_firebase/widgets/custom_form_field.dart';
 import 'package:flutter/material.dart';
@@ -10,8 +11,8 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  final TextEditingController emailController = TextEditingController();
-  final TextEditingController passwordController = TextEditingController();
+  late String? _email;
+  late String? _password;
   final _formKey = GlobalKey<FormState>();
 
   @override
@@ -27,12 +28,32 @@ class _LoginPageState extends State<LoginPage> {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                CustomFormField(controller: emailController, labelText: 'E-mail', padding: const EdgeInsets.only(bottom: 10)),
-                CustomFormField(controller: passwordController, labelText: 'Senha'),
+                CustomFormField(
+                  labelText: 'E-mail',
+                  onSaved: (email) {
+                    _email = email;
+                  },
+                  padding: const EdgeInsets.only(bottom: 10),
+                  keyboardType: TextInputType.emailAddress,
+                  validatorRegex: emailRegex,
+                  validatorMessage: 'E-mail inválido',
+                ),
+                CustomFormField(
+                  labelText: 'Senha',
+                  onSaved: (password) {
+                    _password = password;
+                  },
+                  keyboardType: TextInputType.visiblePassword,
+                  obscureText: true,
+                ),
                 CustomButton(
                   label: 'Login',
                   onPressed: () {
-
+                    if (_formKey.currentState!.validate()) {
+                      _formKey.currentState!.save();
+                      print(_email);
+                      print(_password);
+                    }
                   },
                 ),
               ],
