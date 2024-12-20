@@ -1,3 +1,5 @@
+import 'package:chat_flutter_firebase/pages/home/home_page.dart';
+import 'package:chat_flutter_firebase/pages/login/login_page.dart';
 import 'package:flutter/material.dart';
 
 class NavigationService {
@@ -5,8 +7,9 @@ class NavigationService {
 
   GlobalKey<NavigatorState> get navigatorKey => _navigatorKey;
 
-  final Map<String, Widget> routes = {
-    '/login': const Text('Login'),
+  final Map<String, WidgetBuilder> routes = {
+    '/login': (_) => const LoginPage(),
+    '/home': (_) => const HomePage(),
   };
 
   void navigateToNamed(String routeName) => _navigatorKey.currentState!.pushNamed(routeName);
