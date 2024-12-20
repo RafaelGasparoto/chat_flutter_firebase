@@ -1,4 +1,5 @@
 import 'package:chat_flutter_firebase/services/auth_service.dart';
+import 'package:chat_flutter_firebase/services/navigation_service.dart';
 import 'package:chat_flutter_firebase/utils/regex.dart';
 import 'package:chat_flutter_firebase/widgets/custom_button.dart';
 import 'package:chat_flutter_firebase/widgets/custom_form_field.dart';
@@ -18,11 +19,13 @@ class _LoginPageState extends State<LoginPage> {
 
   final GetIt _getIt = GetIt.instance;
   late AuthService _authService;
+  late NavigationService _navigationService;
 
   @override
   void initState() {
     super.initState();
     _authService = _getIt.get<AuthService>();
+    _navigationService = _getIt.get<NavigationService>();
   }
 
   @override
@@ -63,7 +66,7 @@ class _LoginPageState extends State<LoginPage> {
                       _formKey.currentState!.save();
                       final result = await _authService.login(_email!, _password!);
                       if(result) {
-                        print('Login realizado com sucesso.');
+                        _navigationService.replaceToNamed('/home');
                       } else {
                         print('Login falhou.');
                       }
