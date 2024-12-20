@@ -7,6 +7,10 @@ class AuthService {
 
   User? get user => _user;
 
+  AuthService() {
+    _firebaseAuth.authStateChanges().listen((user) => _user = user);
+  }
+
   Future<bool> login(String email, String password) async {
     try {
       UserCredential userCredential = await _firebaseAuth.signInWithEmailAndPassword(email: email, password: password);
@@ -17,6 +21,17 @@ class AuthService {
     } catch (e) {
       print(e);
     }
+    return false;
+  }
+
+  Future<bool> logout() async {
+    try {
+      await _firebaseAuth.signOut();
+      return true;
+    } catch (e) {
+      print(e);
+    }
+    
     return false;
   }
 }
