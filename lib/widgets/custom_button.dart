@@ -5,10 +5,12 @@ class CustomButton extends StatelessWidget {
     super.key,
     this.padding,
     required this.label,
+    required this.onPressed,
   });
 
   final String label;
   final EdgeInsets? padding;
+  final void Function() onPressed;
 
   @override
   Widget build(BuildContext context) {
@@ -16,7 +18,7 @@ class CustomButton extends StatelessWidget {
       padding: padding ?? const EdgeInsets.all(0),
       child: LayoutBuilder(
         builder: (context, constraints) => ElevatedButton(
-          onPressed: () {},
+          onPressed: onPressed,
           style: ButtonStyle(
             minimumSize: WidgetStateProperty.all<Size>(
               Size(constraints.maxWidth, 30),
