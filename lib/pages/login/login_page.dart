@@ -1,7 +1,9 @@
+import 'package:chat_flutter_firebase/services/auth_service.dart';
 import 'package:chat_flutter_firebase/utils/regex.dart';
 import 'package:chat_flutter_firebase/widgets/custom_button.dart';
 import 'package:chat_flutter_firebase/widgets/custom_form_field.dart';
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -11,9 +13,17 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  late String? _email;
-  late String? _password;
+  late String? _email, _password;
   final _formKey = GlobalKey<FormState>();
+
+  final GetIt _getIt = GetIt.instance;
+  late AuthService _authService;
+
+  @override
+  void initState() {
+    super.initState();
+    _authService = _getIt.get<AuthService>();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -48,11 +58,15 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 CustomButton(
                   label: 'Login',
-                  onPressed: () {
+                  onPressed: () async {
                     if (_formKey.currentState!.validate()) {
                       _formKey.currentState!.save();
-                      print(_email);
-                      print(_password);
+                      final result = await _authService.login(_email!, _password!);
+                      if(result) {
+                        print('Login realizado com sucesso.');
+                      } else {
+                        print('Login falhou.');
+                      }
                     }
                   },
                 ),
