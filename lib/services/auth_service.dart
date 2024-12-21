@@ -1,7 +1,10 @@
+import 'package:chat_flutter_firebase/services/snackbar_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:get_it/get_it.dart';
 
 class AuthService {
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
+  final SnackbarService _snackbarService = GetIt.instance.get<SnackbarService>();
 
   User? _user;
 
@@ -18,8 +21,14 @@ class AuthService {
         _user = userCredential.user;
         return true;
       }
-    } catch (e) {
-      print(e);
+    } on FirebaseAuthException catch (exception) {
+      if (exception.code == 'user-not-found') {
+        _snackbarService.snackBarWarning(message: 'Usuário não encontrado!');
+      } else if (exception.code == 'wrong-password') {
+        _snackbarService.snackBarWarning(message: 'Senha incorreta!');
+      } else {
+        _snackbarService.snackBarError(message: 'Falha ao realizar login!');
+      }
     }
     return false;
   }
@@ -31,7 +40,7 @@ class AuthService {
     } catch (e) {
       print(e);
     }
-    
+
     return false;
   }
 
@@ -40,10 +49,15 @@ class AuthService {
       UserCredential userCredential = await _firebaseAuth.createUserWithEmailAndPassword(email: email, password: password);
       if (userCredential.user != null) {
         _user = userCredential.user;
+        _snackbarService.snackBarSucess(message: 'Cadastro realizado com sucesso.');
         return true;
       }
-    } catch (e) {
-      print(e);
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'email-already-in-use') {
+        _snackbarService.snackBarError(message: 'O email informado ja esta cadastrado!');
+      } else {
+        _snackbarService.snackBarError(message: 'Não foi possivel realizar o cadastro!');
+      }
     }
     return false;
   }

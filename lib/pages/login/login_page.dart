@@ -87,8 +87,6 @@ class _LoginPageState extends State<LoginPage> {
                   final result = await _authService.login(_email!, _password!);
                   if (result) {
                     _navigationService.replaceToNamed('/home');
-                  } else {
-                    _alertService.snackBarWarning(message: 'Login inválido');
                   }
                 }
               },
