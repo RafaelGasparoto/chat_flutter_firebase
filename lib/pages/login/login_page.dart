@@ -36,50 +36,80 @@ class _LoginPageState extends State<LoginPage> {
     return Scaffold(
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 15),
-          child: Form(
-            key: _formKey,
-            autovalidateMode: AutovalidateMode.always,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                CustomFormField(
-                  labelText: 'E-mail',
-                  onSaved: (email) {
-                    _email = email;
-                  },
-                  padding: const EdgeInsets.only(bottom: 10),
-                  keyboardType: TextInputType.emailAddress,
-                  validatorRegex: emailRegex,
-                  validatorMessage: 'E-mail inválido',
-                ),
-                CustomFormField(
-                  labelText: 'Senha',
-                  onSaved: (password) {
-                    _password = password;
-                  },
-                  keyboardType: TextInputType.visiblePassword,
-                  obscureText: true,
-                ),
-                CustomButton(
-                  label: 'Login',
-                  onPressed: () async {
-                    if (_formKey.currentState!.validate()) {
-                      _formKey.currentState!.save();
-                      final result = await _authService.login(_email!, _password!);
-                      if(result) {
-                        _navigationService.replaceToNamed('/home');
-                      } else {
-                        _alertService.snackBarWarning(message: 'Login inválido');
-                      }
-                    }
-                  },
-                ),
-              ],
-            ),
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Stack(
+            children: [
+              _formLogin(),
+              _registerUser(),
+            ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _formLogin() {
+    return Center(
+      child: Form(
+        key: _formKey,
+        autovalidateMode: AutovalidateMode.always,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            CustomFormField(
+              labelText: 'E-mail',
+              onSaved: (email) {
+                _email = email;
+              },
+              padding: const EdgeInsets.only(bottom: 10),
+              keyboardType: TextInputType.emailAddress,
+              validatorRegex: emailRegex,
+              validatorMessage: 'E-mail inválido',
+            ),
+            CustomFormField(
+              labelText: 'Senha',
+              onSaved: (password) {
+                _password = password;
+              },
+              keyboardType: TextInputType.visiblePassword,
+              obscureText: true,
+            ),
+            const SizedBox(
+              height: 20,
+            ),
+            CustomButton(
+              label: 'Login',
+              onPressed: () async {
+                if (_formKey.currentState!.validate()) {
+                  _formKey.currentState!.save();
+                  final result = await _authService.login(_email!, _password!);
+                  if (result) {
+                    _navigationService.replaceToNamed('/home');
+                  } else {
+                    _alertService.snackBarWarning(message: 'Login inválido');
+                  }
+                }
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _registerUser() {
+    return Align(
+      alignment: Alignment.bottomCenter,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          const Text('Não possui uma conta? '),
+          TextButton(
+            onPressed: () => _navigationService.navigateToNamed('/register'),
+            child: const Text('Cadastre-se'),
+          ),
+        ],
       ),
     );
   }
