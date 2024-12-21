@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:chat_flutter_firebase/services/auth_service.dart';
+import 'package:chat_flutter_firebase/services/media_service.dart';
 import 'package:chat_flutter_firebase/services/navigation_service.dart';
 import 'package:chat_flutter_firebase/services/snackbar_service.dart';
 import 'package:chat_flutter_firebase/utils/regex.dart';
@@ -19,17 +22,20 @@ class _RegisterPageState extends State<RegisterPage> {
   late final NavigationService _navigationService;
   late final SnackbarService _snackbarService;
   late final AuthService _authService;
+  late final MediaService _mediaService;
 
   final _formKey = GlobalKey<FormState>();
   String? _name;
   String? _email;
   String? _password;
+  File? _selectedImage;
 
   @override
   void initState() {
     _navigationService = _getIt.get<NavigationService>();
     _snackbarService = _getIt.get<SnackbarService>();
     _authService = _getIt.get<AuthService>();
+    _mediaService = _getIt.get<MediaService>();
     super.initState();
   }
 
@@ -57,11 +63,40 @@ class _RegisterPageState extends State<RegisterPage> {
   }
 
   Widget _profilePicture() {
-    return const Padding(
-      padding: EdgeInsets.only(bottom: 30),
-      child: CircleAvatar(
-        radius: 60,
-        backgroundImage: NetworkImage('https://i.pravatar.cc/400'),
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 30),
+      child: GestureDetector(
+        onTap: () async {
+          File? selectedImage = await _mediaService.getImage();
+
+          if (selectedImage != null) {
+            setState(() {
+              _selectedImage = selectedImage;
+            });
+          }
+        },
+        child: CircleAvatar(
+          backgroundColor: Colors.grey.shade100,
+          radius: 60,
+          backgroundImage: _selectedImage != null ? FileImage(_selectedImage!) : const AssetImage('assets/user.png'),
+          child: Align(
+            alignment: Alignment.bottomRight,
+            child: Container(
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(),
+                color: Colors.white,
+              ),
+              height: 45,
+              width: 45,
+              child: const Icon(
+                Icons.camera_alt,
+                size: 30,
+                color: Colors.black,
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }
