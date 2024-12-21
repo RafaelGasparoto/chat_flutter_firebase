@@ -34,4 +34,17 @@ class AuthService {
     
     return false;
   }
+
+  Future<bool> singUp({required String email, required String password}) async {
+    try {
+      UserCredential userCredential = await _firebaseAuth.createUserWithEmailAndPassword(email: email, password: password);
+      if (userCredential.user != null) {
+        _user = userCredential.user;
+        return true;
+      }
+    } catch (e) {
+      print(e);
+    }
+    return false;
+  }
 }
