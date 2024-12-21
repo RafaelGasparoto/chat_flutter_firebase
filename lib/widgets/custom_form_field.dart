@@ -6,17 +6,15 @@ class CustomFormField extends StatelessWidget {
     required this.onSaved,
     this.padding,
     this.keyboardType,
-    this.validatorRegex,
     this.obscureText = false,
-    this.validatorMessage,
+    this.validator,
     super.key,
   });
 
   final String labelText;
   final EdgeInsets? padding;
   final TextInputType? keyboardType;
-  final RegExp? validatorRegex;
-  final String? validatorMessage;
+  final String? Function(String?)? validator;
   final void Function(String?)? onSaved;
   final bool obscureText;
 
@@ -30,12 +28,7 @@ class CustomFormField extends StatelessWidget {
           border: const OutlineInputBorder(),
           labelText: labelText,
         ),
-        validator: (String? value) {
-          if(value != null && validatorRegex != null && !validatorRegex!.hasMatch(value)) {
-            return validatorMessage ?? 'Campo inválido';
-          }
-          return null;
-        },
+        validator: validator,
         obscureText: obscureText,
         autovalidateMode: AutovalidateMode.onUserInteraction,
         onSaved: onSaved,

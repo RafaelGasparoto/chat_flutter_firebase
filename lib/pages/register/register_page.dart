@@ -105,7 +105,6 @@ class _RegisterPageState extends State<RegisterPage> {
     return Center(
       child: Form(
         key: _formKey,
-        autovalidateMode: AutovalidateMode.always,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -113,6 +112,10 @@ class _RegisterPageState extends State<RegisterPage> {
               labelText: 'Nome',
               onSaved: (name) {
                 _name = name;
+              },
+              validator: (name) {
+                if(name == null || name.isEmpty) return 'Nome não pode ser vazio';
+                return null;
               },
             ),
             const SizedBox(
@@ -124,8 +127,10 @@ class _RegisterPageState extends State<RegisterPage> {
                 _email = email;
               },
               keyboardType: TextInputType.emailAddress,
-              validatorRegex: emailRegex,
-              validatorMessage: 'E-mail inválido',
+              validator: (email) {
+                if (email != null && !emailRegex.hasMatch(email)) return 'E-mail inválido';
+                return null;
+              },
             ),
             const SizedBox(
               height: 30,
@@ -137,6 +142,10 @@ class _RegisterPageState extends State<RegisterPage> {
               },
               keyboardType: TextInputType.visiblePassword,
               obscureText: true,
+              validator: (password) {
+                if(password == null || password.length < 6) return 'Senha precisa ter ao menos 6 caracteres';
+                return null;
+              },
             ),
             const SizedBox(
               height: 20,

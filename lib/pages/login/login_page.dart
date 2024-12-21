@@ -52,7 +52,7 @@ class _LoginPageState extends State<LoginPage> {
     return Center(
       child: Form(
         key: _formKey,
-        autovalidateMode: AutovalidateMode.always,
+        autovalidateMode: AutovalidateMode.onUserInteraction,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -63,8 +63,10 @@ class _LoginPageState extends State<LoginPage> {
               },
               padding: const EdgeInsets.only(bottom: 10),
               keyboardType: TextInputType.emailAddress,
-              validatorRegex: emailRegex,
-              validatorMessage: 'E-mail inválido',
+              validator: (email) {
+                if(email != null && !emailRegex.hasMatch(email)) return 'E-mail inválido';
+                return null;
+              },
             ),
             CustomFormField(
               labelText: 'Senha',
