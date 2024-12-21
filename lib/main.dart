@@ -7,7 +7,7 @@ import 'package:get_it/get_it.dart';
 
 Future<void> main() async {
   await setup();
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 Future<void> setup() async {
