@@ -54,7 +54,7 @@ class AuthService {
       }
     } on FirebaseAuthException catch (e) {
       if (e.code == 'email-already-in-use') {
-        _snackbarService.snackBarError(message: 'O email informado ja esta cadastrado!');
+        _snackbarService.snackBarError(message: 'O email informado já está cadastrado!');
       } else {
         _snackbarService.snackBarError(message: 'Não foi possivel realizar o cadastro!');
       }
