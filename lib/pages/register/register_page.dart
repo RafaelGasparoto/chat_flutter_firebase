@@ -1,6 +1,8 @@
 import 'dart:io';
 
+import 'package:chat_flutter_firebase/models/user.dart';
 import 'package:chat_flutter_firebase/services/auth_service.dart';
+import 'package:chat_flutter_firebase/services/database_service.dart';
 import 'package:chat_flutter_firebase/services/media_service.dart';
 import 'package:chat_flutter_firebase/services/navigation_service.dart';
 import 'package:chat_flutter_firebase/services/snackbar_service.dart';
@@ -23,6 +25,7 @@ class _RegisterPageState extends State<RegisterPage> {
   late final SnackbarService _snackbarService;
   late final AuthService _authService;
   late final MediaService _mediaService;
+  late final DatabaseService _databaseService;
 
   final _formKey = GlobalKey<FormState>();
   String? _name;
@@ -36,6 +39,7 @@ class _RegisterPageState extends State<RegisterPage> {
     _snackbarService = _getIt.get<SnackbarService>();
     _authService = _getIt.get<AuthService>();
     _mediaService = _getIt.get<MediaService>();
+    _databaseService = _getIt.get<DatabaseService>();
     super.initState();
   }
 
@@ -114,7 +118,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 _name = name;
               },
               validator: (name) {
-                if(name == null || name.isEmpty) return 'Nome não pode ser vazio';
+                if (name == null || name.isEmpty) return 'Nome não pode ser vazio';
                 return null;
               },
             ),
@@ -143,7 +147,7 @@ class _RegisterPageState extends State<RegisterPage> {
               keyboardType: TextInputType.visiblePassword,
               obscureText: true,
               validator: (password) {
-                if(password == null || password.length < 6) return 'Senha precisa ter ao menos 6 caracteres';
+                if (password == null || password.length < 6) return 'Senha precisa ter ao menos 6 caracteres';
                 return null;
               },
             ),
@@ -165,10 +169,14 @@ class _RegisterPageState extends State<RegisterPage> {
       _formKey.currentState!.save();
       final result = await _authService.singUp(email: _email!, password: _password!);
       if (result) {
-        _snackbarService.snackBarSucess(message: 'Usuário cadastrado com sucesso');
+        _databaseService.createUser(
+          user: User(
+            uid: _authService.user!.uid,
+            email: _email!,
+            name: _name!,
+          ),
+        );
         _navigationService.goBack();
-      } else {
-        _snackbarService.snackBarError(message: 'Erro ao cadastrar usuário');
       }
     }
   }
