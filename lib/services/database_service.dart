@@ -1,8 +1,11 @@
 import 'package:chat_flutter_firebase/models/user.dart';
+import 'package:chat_flutter_firebase/services/auth_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:get_it/get_it.dart';
 
 class DatabaseService {
   final FirebaseFirestore _firebaseFirestore = FirebaseFirestore.instance;
+  final AuthService _authService = GetIt.instance.get<AuthService>();
 
   CollectionReference? _userCollection;
 
@@ -23,5 +26,9 @@ class DatabaseService {
     } catch (e) {
       print(e);
     }
+  }
+
+  Stream<QuerySnapshot<User>> getStreamUsers() {
+    return _userCollection!.where('uid', isNotEqualTo: _authService.user!.uid).snapshots() as Stream<QuerySnapshot<User>>;
   }
 }
