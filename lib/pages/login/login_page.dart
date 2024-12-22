@@ -1,4 +1,3 @@
-import 'package:chat_flutter_firebase/services/snackbar_service.dart';
 import 'package:chat_flutter_firebase/services/auth_service.dart';
 import 'package:chat_flutter_firebase/services/navigation_service.dart';
 import 'package:chat_flutter_firebase/utils/regex.dart';
@@ -21,14 +20,12 @@ class _LoginPageState extends State<LoginPage> {
   final GetIt _getIt = GetIt.instance;
   late AuthService _authService;
   late NavigationService _navigationService;
-  late SnackbarService _alertService;
 
   @override
   void initState() {
     super.initState();
     _authService = _getIt.get<AuthService>();
     _navigationService = _getIt.get<NavigationService>();
-    _alertService = _getIt.get<SnackbarService>();
   }
 
   @override

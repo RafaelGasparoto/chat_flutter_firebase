@@ -5,7 +5,6 @@ import 'package:chat_flutter_firebase/services/auth_service.dart';
 import 'package:chat_flutter_firebase/services/database_service.dart';
 import 'package:chat_flutter_firebase/services/media_service.dart';
 import 'package:chat_flutter_firebase/services/navigation_service.dart';
-import 'package:chat_flutter_firebase/services/snackbar_service.dart';
 import 'package:chat_flutter_firebase/utils/regex.dart';
 import 'package:chat_flutter_firebase/widgets/custom_button.dart';
 import 'package:chat_flutter_firebase/widgets/custom_form_field.dart';
@@ -22,7 +21,6 @@ class RegisterPage extends StatefulWidget {
 class _RegisterPageState extends State<RegisterPage> {
   final GetIt _getIt = GetIt.instance;
   late final NavigationService _navigationService;
-  late final SnackbarService _snackbarService;
   late final AuthService _authService;
   late final MediaService _mediaService;
   late final DatabaseService _databaseService;
@@ -36,7 +34,6 @@ class _RegisterPageState extends State<RegisterPage> {
   @override
   void initState() {
     _navigationService = _getIt.get<NavigationService>();
-    _snackbarService = _getIt.get<SnackbarService>();
     _authService = _getIt.get<AuthService>();
     _mediaService = _getIt.get<MediaService>();
     _databaseService = _getIt.get<DatabaseService>();
