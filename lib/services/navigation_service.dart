@@ -13,10 +13,13 @@ class NavigationService {
     '/login': (_) => const LoginPage(),
     '/home': (_) => const HomePage(),
     '/register': (_) => const RegisterPage(),
-    '/chat': (_) => const ChatPage(),
   };
 
-  void navigateToNamed(String routeName) => _navigatorKey.currentState!.pushNamed(routeName);
+  void pushRoute(MaterialPageRoute route) {
+    _navigatorKey.currentState!.push(route);
+  }
+
+  void pushNamed(String routeName) => _navigatorKey.currentState!.pushNamed(routeName);
 
   void replaceToNamed(String routeName) => _navigatorKey.currentState!.pushReplacementNamed(routeName);
 

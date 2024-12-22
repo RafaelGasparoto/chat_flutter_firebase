@@ -103,7 +103,7 @@ class _LoginPageState extends State<LoginPage> {
         children: [
           const Text('Não possui uma conta? '),
           TextButton(
-            onPressed: () => _navigationService.navigateToNamed('/register'),
+            onPressed: () => _navigationService.pushNamed('/register'),
             child: const Text('Cadastre-se'),
           ),
         ],
