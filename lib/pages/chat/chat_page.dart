@@ -1,4 +1,3 @@
-import 'package:chat_flutter_firebase/models/chat.dart';
 import 'package:chat_flutter_firebase/models/message.dart';
 import 'package:chat_flutter_firebase/models/user.dart';
 import 'package:chat_flutter_firebase/services/auth_service.dart';
@@ -49,15 +48,15 @@ class _ChatPageState extends State<ChatPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: StreamBuilder(
-        stream: _databaseService.getStreamChat(generateChatId(uid1: _authService.user!.uid, uid2: widget.otherUser.uid!)),
+        stream: _databaseService.getStreamMessages(_chatId),
         builder: (context, snapshot) {
           if (snapshot.hasError) {
             return const Text('Erro ao buscar chat');
           }
 
           if (snapshot.hasData && snapshot.data != null) {
-            Chat chat = snapshot.data!.data()!;
-            List<ChatMessage> messages = _generateMessages(chat);
+            List<Message> message = snapshot.data!;
+            List<ChatMessage> chatMessages = _generateMessages(message);
 
             return DashChat(
               messageOptions: const MessageOptions(
@@ -65,7 +64,7 @@ class _ChatPageState extends State<ChatPage> {
               ),
               currentUser: _currentUserChat,
               onSend: (ChatMessage message) => _sendMessage(message),
-              messages: messages,
+              messages: chatMessages,
             );
           }
 
@@ -86,18 +85,18 @@ class _ChatPageState extends State<ChatPage> {
     await _databaseService.sendMessage(chatId: _chatId, message: message);
   }
 
-  List<ChatMessage> _generateMessages(Chat chat) {
-    List<ChatMessage> messages = [];
-    if (chat.messages != null && chat.messages!.isNotEmpty) {
-      messages = chat.messages!
-          .map((message) => ChatMessage(
-                text: message.content!,
-                createdAt: message.sentAt!.toDate(),
-                user: message.senderId == _currentUserChat.id ? _currentUserChat : _otherUserChat,
-              ))
-          .toList();
-      messages.sort((ChatMessage a, ChatMessage b) => b.createdAt.compareTo(a.createdAt));
-    }
-    return messages;
+  List<ChatMessage> _generateMessages(List<Message> messages) {
+    List<ChatMessage> chatMessages = [];
+
+    chatMessages = messages
+        .map((message) => ChatMessage(
+              text: message.content!,
+              createdAt: message.sentAt!.toDate(),
+              user: message.senderId == _currentUserChat.id ? _currentUserChat : _otherUserChat,
+            ))
+        .toList();
+    chatMessages.sort((ChatMessage a, ChatMessage b) => b.createdAt.compareTo(a.createdAt));
+
+    return chatMessages;
   }
 }
