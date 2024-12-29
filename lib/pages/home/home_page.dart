@@ -30,9 +30,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: _appBar(),
-      body: Scaffold(
-        body: _body(),
-      ),
+      body: _body(),
     );
   }
 
@@ -74,12 +72,18 @@ class _HomePageState extends State<HomePage> {
         }
 
         if (snapshot.hasData && snapshot.data != null) {
-          return ListView.builder(
-            shrinkWrap: true,
-            itemCount: snapshot.data!.docs.length,
-            itemBuilder: (context, index) {
-              return ChatListTile(snapshot.data!.docs[index].data());
-            },
+          return Padding(
+            padding: const EdgeInsets.only(top: 10),
+            child: ListView.separated(
+              separatorBuilder: (context, index) {
+                return const Divider();
+              },
+              shrinkWrap: true,
+              itemCount: snapshot.data!.docs.length,
+              itemBuilder: (context, index) {
+                return ChatListTile(snapshot.data!.docs[index].data());
+              },
+            ),
           );
         }
 

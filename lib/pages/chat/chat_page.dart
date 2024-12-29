@@ -47,6 +47,14 @@ class _ChatPageState extends State<ChatPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: Row(
+          children: [
+            const CircleAvatar(backgroundImage: NetworkImage('https://i.pravatar.cc/300')),
+            Padding(padding: const EdgeInsets.only(left: 10), child: Text(widget.otherUser.name!)),
+          ],
+        ),
+      ),
       body: StreamBuilder(
         stream: _databaseService.getStreamMessages(_chatId),
         builder: (context, snapshot) {
@@ -61,6 +69,9 @@ class _ChatPageState extends State<ChatPage> {
             return DashChat(
               messageOptions: const MessageOptions(
                 showTime: true,
+                containerColor: Color(0XFF2C2F33),
+                textColor: Colors.white,
+                currentUserTextColor: Colors.white,
               ),
               currentUser: _currentUserChat,
               onSend: (ChatMessage message) => _sendMessage(message),

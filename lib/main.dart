@@ -31,8 +31,19 @@ class MyApp extends StatelessWidget {
       initialRoute: authService.user != null ? '/home' : '/login',
       title: 'Chat Flutter Firebase',
       theme: ThemeData(
-        colorScheme: const ColorScheme.light(),
-        useMaterial3: true,
+        colorScheme: const ColorScheme.light().copyWith(
+          secondary: const Color(0XFF2C2F33),
+        ),
+        useMaterial3: false,
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Color(0XFF2C2F33), 
+          titleTextStyle: TextStyle(
+            color: Colors.white,
+            fontSize: 20,
+            fontWeight: FontWeight.bold
+          ),
+        ),
+        dividerColor: const Color(0XFF99AAB5),
       ),
     );
   }
