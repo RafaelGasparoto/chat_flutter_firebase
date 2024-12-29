@@ -41,6 +41,15 @@ class DatabaseService {
     return _userCollection!.where('uid', isNotEqualTo: _authService.user!.uid).snapshots() as Stream<QuerySnapshot<User>>;
   }
 
+  Stream<Message?> getLastMessage(String otherUserUid) {
+    final currentUserUid = _authService.user!.uid;
+    final chatId = generateChatId(uid1: currentUserUid, uid2: otherUserUid);
+    return FirebaseFirestore.instance.collection('chats').doc(chatId).collection('messages').orderBy('sentAt', descending: true).limit(1).snapshots().map((snapshot) {
+      if (snapshot.docs.isNotEmpty) return Message.fromJson(snapshot.docs.first.data());
+      return null;
+    });
+  }
+
   Future<bool> checkChatExists(String uid1, String uid2) async {
     final chatId = generateChatId(uid1: uid1, uid2: uid2);
     final chat = await _chatCollection!.doc(chatId).get();
