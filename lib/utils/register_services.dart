@@ -1,3 +1,4 @@
+import 'package:chat_flutter_firebase/services/current_user_service.dart';
 import 'package:chat_flutter_firebase/services/database_service.dart';
 import 'package:chat_flutter_firebase/services/media_service.dart';
 import 'package:chat_flutter_firebase/services/snackbar_service.dart';
@@ -10,6 +11,7 @@ Future<void> registerServices() async {
   
   getIt.registerSingleton<NavigationService>(NavigationService());
   getIt.registerSingleton<SnackbarService>(SnackbarService());
+  getIt.registerSingleton<CurrentUserService>(CurrentUserService());
   getIt.registerSingleton<AuthService>(AuthService());
   getIt.registerSingleton<MediaService>(MediaService());
   getIt.registerSingleton<DatabaseService>(DatabaseService());

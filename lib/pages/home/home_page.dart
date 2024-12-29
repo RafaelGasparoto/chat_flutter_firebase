@@ -1,5 +1,6 @@
 import 'package:chat_flutter_firebase/pages/home/components/chat_list_tile.dart';
 import 'package:chat_flutter_firebase/services/auth_service.dart';
+import 'package:chat_flutter_firebase/services/current_user_service.dart';
 import 'package:chat_flutter_firebase/services/database_service.dart';
 import 'package:chat_flutter_firebase/services/navigation_service.dart';
 import 'package:flutter/material.dart';
@@ -17,13 +18,20 @@ class _HomePageState extends State<HomePage> {
   late final AuthService _authService;
   late final NavigationService _navigationService;
   late final DatabaseService _databaseService;
+  late final CurrentUserService _currentUser;
 
   @override
   void initState() {
     _authService = GetIt.instance.get<AuthService>();
     _navigationService = GetIt.instance.get<NavigationService>();
     _databaseService = GetIt.instance.get<DatabaseService>();
+    _getCurrentUser();
     super.initState();
+  }
+
+  Future<void> _getCurrentUser() async {
+    _currentUser = getIt.get<CurrentUserService>();
+    _currentUser.user = await _databaseService.getUser(_authService.user!.uid);
   }
 
   @override
