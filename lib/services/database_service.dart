@@ -44,7 +44,7 @@ class DatabaseService {
   Stream<Message?> getLastMessage(String otherUserUid) {
     final currentUserUid = _authService.user!.uid;
     final chatId = generateChatId(uid1: currentUserUid, uid2: otherUserUid);
-    return FirebaseFirestore.instance.collection('chats').doc(chatId).collection('messages').orderBy('sentAt', descending: true).limit(1).snapshots().map((snapshot) {
+    return _chatCollection!.doc(chatId).collection('messages').orderBy('sentAt', descending: true).limit(1).snapshots().map((snapshot) {
       if (snapshot.docs.isNotEmpty) return Message.fromJson(snapshot.docs.first.data());
       return null;
     });
@@ -68,11 +68,12 @@ class DatabaseService {
     await docRef.set(chat);
   }
 
-  Stream<DocumentSnapshot<Chat>> getStreamChat(String chatId) => _chatCollection!.doc(chatId).snapshots() as Stream<DocumentSnapshot<Chat>>;
-
-  Future<void> sendMessage({required String chatId, required Message message}) async {
-    await _chatCollection!.doc(chatId).update({
-      'messages': FieldValue.arrayUnion([message.toJson()])
+  Stream<List<Message>> getStreamMessages(String chatId) {
+    return _chatCollection!.doc(chatId).collection('messages').snapshots().map((snapshot) {
+      if (snapshot.docs.isNotEmpty) return snapshot.docs.map((message) => Message.fromJson(message.data())).toList();
+      return [];
     });
   }
+
+  Future<void> sendMessage({required String chatId, required Message message}) async => await _chatCollection!.doc(chatId).collection('messages').doc().set(message.toJson());
 }
