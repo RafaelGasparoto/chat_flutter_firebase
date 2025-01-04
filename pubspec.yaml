@@ -43,6 +43,7 @@ dependencies:
   json_annotation: ^4.9.0
   retrofit: ^4.4.1
   dash_chat_2: ^0.0.21
+  get: ^4.6.6
   get_it: ^8.0.3
 
 dev_dependencies:
