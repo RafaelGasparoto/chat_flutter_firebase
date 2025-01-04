@@ -3,6 +3,8 @@ import 'package:chat_flutter_firebase/pages/request/components/friend_checkbox.d
 import 'package:chat_flutter_firebase/pages/request/components/label_divider.dart';
 import 'package:chat_flutter_firebase/pages/request/components/selected_friend.dart';
 import 'package:chat_flutter_firebase/services/database_service.dart';
+import 'package:chat_flutter_firebase/services/navigation_service.dart';
+import 'package:chat_flutter_firebase/widgets/custom_button.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_it/get_it.dart';
@@ -17,13 +19,14 @@ class CreateGroupTab extends StatefulWidget {
 class _CreateGroupTabState extends State<CreateGroupTab> {
   final GetIt getIt = GetIt.instance;
   late final DatabaseService _databaseService;
+  late final NavigationService _navigationService;
   RxList<User> selectedFriends = <User>[].obs;
   List<User> friends = [];
 
   @override
   void initState() {
     _databaseService = getIt.get<DatabaseService>();
-
+    _navigationService = getIt.get<NavigationService>();
     super.initState();
   }
 
@@ -32,6 +35,7 @@ class _CreateGroupTabState extends State<CreateGroupTab> {
     return Column(
       children: [
         _selectedFriends(),
+        _createGroup(context),
         const LabelDivider('Lista de Amigos'),
         _friendList(),
       ],
@@ -89,6 +93,22 @@ class _CreateGroupTabState extends State<CreateGroupTab> {
 
           return const Center(child: CircularProgressIndicator());
         },
+      ),
+    );
+  }
+
+  Widget _createGroup(BuildContext context) {
+    return Obx(() =>
+      AnimatedContainer(
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.fastOutSlowIn,
+        width: selectedFriends.isNotEmpty ? context.width : 0,
+        child: CustomButton(
+          label: 'Criar Grupo',
+          onPressed: () {
+            _navigationService.pushNamed('/group-create');
+          },
+        ),
       ),
     );
   }

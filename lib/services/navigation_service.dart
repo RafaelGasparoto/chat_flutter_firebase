@@ -1,3 +1,4 @@
+import 'package:chat_flutter_firebase/pages/request/group_create.dart';
 import 'package:chat_flutter_firebase/pages/request/request_page.dart';
 import 'package:chat_flutter_firebase/pages/home/home_page.dart';
 import 'package:chat_flutter_firebase/pages/login/login_page.dart';
@@ -14,6 +15,7 @@ class NavigationService {
     '/home': (_) => const HomePage(),
     '/register': (_) => const RegisterPage(),
     '/request': (_) => const RequestPage(),
+    '/group-create': (_) => const GroupCreate(),
   };
 
   void pushRoute(MaterialPageRoute route) {

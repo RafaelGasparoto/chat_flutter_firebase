@@ -24,7 +24,7 @@ class CustomButton extends StatelessWidget {
               Size(constraints.maxWidth, 30),
             ),
           ),
-          child: Text(label),
+          child: FittedBox(child: Text(label)),
         ),
       ),
     );
