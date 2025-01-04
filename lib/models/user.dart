@@ -6,8 +6,9 @@ class User {
   String? uid;
   String? email;
   String? name;
+  List<String>? friends;
 
-  User({this.uid, this.email, this.name});
+  User({this.uid, this.email, this.name, this.friends});
 
   factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
 
