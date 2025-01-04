@@ -1,3 +1,4 @@
+import 'package:chat_flutter_firebase/pages/request/components/create_group_tab.dart';
 import 'package:chat_flutter_firebase/pages/request/components/friend_request_tab.dart';
 import 'package:flutter/material.dart';
 
@@ -23,20 +24,14 @@ class RequestPage extends StatelessWidget {
   }
 
   Widget _body() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+    return const Padding(
+      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 20),
       child: TabBarView(
         children: [
-          const FriendRequestTab(),
-          _createGroup(),
+          FriendRequestTab(),
+          CreateGroupTab(),
         ],
       ),
-    );
-  }
-
-  _createGroup() {
-    return Center(
-      child: Text('Create Group'),
     );
   }
 }
