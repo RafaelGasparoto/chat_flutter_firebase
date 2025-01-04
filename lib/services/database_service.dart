@@ -53,8 +53,14 @@ class DatabaseService {
     return userDoc.exists ? userDoc.data() : null;
   }
 
-  Stream<QuerySnapshot<User>> getStreamUsers() {
-    return _userCollection!.where('uid', isNotEqualTo: _authService.user!.uid).snapshots();
+  Stream getStreamFriends() {
+    return _userCollection!.doc(_authService.user!.uid).snapshots().asyncMap((user) async {
+      final List<String>? friends = user.data()!.friends;
+      if(friends == null) return [];
+
+      final List<DocumentSnapshot<User>> snapshots = await Future.wait(friends.map((friend) async => _userCollection!.doc(friend).get()).toList()); 
+      return snapshots.map((user) => user.data()!).toList();
+    });
   }
 
   Stream<Message?> getLastMessage(String otherUserUid) {

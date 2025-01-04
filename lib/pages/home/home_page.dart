@@ -83,7 +83,7 @@ class _HomePageState extends State<HomePage> {
 
   Widget _listChats() {
     return StreamBuilder(
-      stream: _databaseService.getStreamUsers(),
+      stream: _databaseService.getStreamFriends(),
       builder: (context, snapshot) {
         if (snapshot.hasError) {
           return const Text('Erro ao buscar usuários');
@@ -97,9 +97,9 @@ class _HomePageState extends State<HomePage> {
                 return const Divider();
               },
               shrinkWrap: true,
-              itemCount: snapshot.data!.docs.length,
+              itemCount: snapshot.data!.length,
               itemBuilder: (context, index) {
-                return ChatListTile(snapshot.data!.docs[index].data());
+                return ChatListTile(snapshot.data![index]);
               },
             ),
           );
