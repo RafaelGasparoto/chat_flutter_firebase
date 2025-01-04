@@ -1,4 +1,5 @@
 import 'package:chat_flutter_firebase/models/friend_request.dart';
+import 'package:chat_flutter_firebase/pages/request/components/label_divider.dart';
 import 'package:chat_flutter_firebase/services/database_service.dart';
 import 'package:chat_flutter_firebase/utils/regex.dart';
 import 'package:chat_flutter_firebase/widgets/custom_button.dart';
@@ -27,30 +28,11 @@ class _FriendRequestTabState extends State<FriendRequestTab> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 20),
-      child: Column(
-        children: [
-          _requestForm(),
-          _labelDivider(),
-          _pendingRequests(),
-        ],
-      ),
-    );
-  }
-
-  Widget _labelDivider() {
-    return const Row(
+    return Column(
       children: [
-        Expanded(child: Divider()),
-        Padding(
-          padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 20),
-          child: Text(
-            'Pedidos Pendentes',
-            style: TextStyle(fontSize: 16),
-          ),
-        ),
-        Expanded(child: Divider()),
+        _requestForm(),
+        const LabelDivider('Pedidos Pendentes'),
+        _pendingRequests(),
       ],
     );
   }
