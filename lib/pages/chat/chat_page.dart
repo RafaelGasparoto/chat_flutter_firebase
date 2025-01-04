@@ -39,7 +39,7 @@ class _ChatPageState extends State<ChatPage> {
       firstName: widget.otherUser.name!,
     );
 
-    _chatId = generateChatId(uid1: _authService.user!.uid, uid2: widget.otherUser.uid!);
+    _chatId = generateId(uid1: _authService.user!.uid, uid2: widget.otherUser.uid!);
 
     super.initState();
   }
