@@ -1,4 +1,4 @@
-import 'package:chat_flutter_firebase/pages/chat/chat_page.dart';
+import 'package:chat_flutter_firebase/pages/request/request_page.dart';
 import 'package:chat_flutter_firebase/pages/home/home_page.dart';
 import 'package:chat_flutter_firebase/pages/login/login_page.dart';
 import 'package:chat_flutter_firebase/pages/register/register_page.dart';
@@ -13,6 +13,7 @@ class NavigationService {
     '/login': (_) => const LoginPage(),
     '/home': (_) => const HomePage(),
     '/register': (_) => const RegisterPage(),
+    '/request': (_) => const RequestPage(),
   };
 
   void pushRoute(MaterialPageRoute route) {

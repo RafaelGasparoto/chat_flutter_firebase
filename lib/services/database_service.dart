@@ -1,7 +1,10 @@
 import 'package:chat_flutter_firebase/models/chat.dart';
+import 'package:chat_flutter_firebase/models/friend_request.dart';
 import 'package:chat_flutter_firebase/models/message.dart';
 import 'package:chat_flutter_firebase/models/user.dart';
 import 'package:chat_flutter_firebase/services/auth_service.dart';
+import 'package:chat_flutter_firebase/services/current_user_service.dart';
+import 'package:chat_flutter_firebase/services/snackbar_service.dart';
 import 'package:chat_flutter_firebase/utils/generate_chat_id.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get_it/get_it.dart';
@@ -9,9 +12,12 @@ import 'package:get_it/get_it.dart';
 class DatabaseService {
   final FirebaseFirestore _firebaseFirestore = FirebaseFirestore.instance;
   final AuthService _authService = GetIt.instance.get<AuthService>();
+  final SnackbarService _snackbarService = GetIt.instance.get<SnackbarService>();
+  final CurrentUserService _currentUserService = GetIt.instance.get<CurrentUserService>();
 
-  CollectionReference? _userCollection;
-  CollectionReference? _chatCollection;
+  CollectionReference<User>? _userCollection;
+  CollectionReference<Chat>? _chatCollection;
+  CollectionReference<FriendRequest>? _friendRequestCollection;
 
   DatabaseService() {
     _setupCollectionsReference();
@@ -27,6 +33,11 @@ class DatabaseService {
           fromFirestore: (snapshot, _) => Chat.fromJson(snapshot.data()!),
           toFirestore: (chat, _) => chat.toJson(),
         );
+
+    _friendRequestCollection = _firebaseFirestore.collection('friend_requests').withConverter<FriendRequest>(
+          fromFirestore: (snapshot, _) => FriendRequest.fromJson(snapshot.data()!),
+          toFirestore: (friendRequest, _) => friendRequest.toJson(),
+        );
   }
 
   Future<void> createUser({required User user}) async {
@@ -37,13 +48,18 @@ class DatabaseService {
     }
   }
 
+  Future<User?> getUser(String userId) async {
+    final userDoc = await _userCollection!.doc(userId).get();
+    return userDoc.exists ? userDoc.data() : null;
+  }
+
   Stream<QuerySnapshot<User>> getStreamUsers() {
-    return _userCollection!.where('uid', isNotEqualTo: _authService.user!.uid).snapshots() as Stream<QuerySnapshot<User>>;
+    return _userCollection!.where('uid', isNotEqualTo: _authService.user!.uid).snapshots();
   }
 
   Stream<Message?> getLastMessage(String otherUserUid) {
     final currentUserUid = _authService.user!.uid;
-    final chatId = generateChatId(uid1: currentUserUid, uid2: otherUserUid);
+    final chatId = generateId(uid1: currentUserUid, uid2: otherUserUid);
     return _chatCollection!.doc(chatId).collection('messages').orderBy('sentAt', descending: true).limit(1).snapshots().map((snapshot) {
       if (snapshot.docs.isNotEmpty) return Message.fromJson(snapshot.docs.first.data());
       return null;
@@ -51,13 +67,13 @@ class DatabaseService {
   }
 
   Future<bool> checkChatExists(String uid1, String uid2) async {
-    final chatId = generateChatId(uid1: uid1, uid2: uid2);
+    final chatId = generateId(uid1: uid1, uid2: uid2);
     final chat = await _chatCollection!.doc(chatId).get();
     return chat.exists;
   }
 
   Future<void> createChat({required String currentUserUid, required String otherUserUid}) async {
-    final String chatId = generateChatId(uid1: currentUserUid, uid2: otherUserUid);
+    final String chatId = generateId(uid1: currentUserUid, uid2: otherUserUid);
     final docRef = _chatCollection!.doc(chatId);
     final Chat chat = Chat(
       id: chatId,
@@ -76,4 +92,65 @@ class DatabaseService {
   }
 
   Future<void> sendMessage({required String chatId, required Message message}) async => await _chatCollection!.doc(chatId).collection('messages').doc().set(message.toJson());
+
+  Future<void> sendFriendRequest({required String emailToSendRequest}) async {
+    final senderEmail = _currentUserService.user!.email;
+    final senderId = _currentUserService.user!.uid;
+    final senderName = _currentUserService.user!.name;
+
+    try {
+      final User? receiver = await _getUserByEmail(emailToSendRequest);
+
+      if (receiver == null) {
+        _snackbarService.snackBarError(message: 'Usuário não encontrado!');
+        return;
+      }
+
+      final FriendRequest friendRequest = FriendRequest(senderEmail: senderEmail, senderId: senderId, senderName: senderName, receiverId: receiver.uid);
+
+      _friendRequestCollection!.doc(generateId(uid1: senderId!, uid2: receiver.uid!)).set(friendRequest);
+
+      _snackbarService.snackBarSucess(message: 'Solicitação de amizade enviada com sucesso!');
+    } catch (e) {
+      _snackbarService.snackBarError(message: 'Falha ao enviar solicitação de amizade!');
+    }
+  }
+
+  Future<void> acceptFriendRequest({required String senderId}) async {
+    try {
+      final receiverId = _currentUserService.user!.uid;
+
+      final FriendRequest friendRequest = await _friendRequestCollection!.doc(generateId(uid1: senderId, uid2: receiverId!)).get().then((value) => value.data()!);
+
+      await _userCollection!.doc(friendRequest.senderId).update({
+        'friends': FieldValue.arrayUnion([friendRequest.receiverId])
+      });
+      await _userCollection!.doc(friendRequest.receiverId).update({
+        'friends': FieldValue.arrayUnion([friendRequest.senderId])
+      });
+
+      await _friendRequestCollection!.doc(generateId(uid1: senderId, uid2: receiverId)).delete();
+      _snackbarService.snackBarSucess(message: 'Solicitação de amizade aceita com sucesso!');
+    } catch (e) {
+      _snackbarService.snackBarError(message: 'Falha ao aceitar solicitação de amizade!');
+    }
+  }
+
+  Future<void> rejectFriendRequest({required String senderId}) async =>
+      await _friendRequestCollection!.doc(generateId(uid1: senderId, uid2: _currentUserService.user!.uid!)).delete();
+
+  Stream<List<FriendRequest>> getStreamFriendRequests() {
+    return _friendRequestCollection!.where('receiverId', isEqualTo: _authService.user!.uid).snapshots().map(
+      (snapshot) {
+        if (snapshot.docs.isNotEmpty) return snapshot.docs.map((friendRequest) => friendRequest.data()).toList();
+        return [];
+      },
+    );
+  }
+
+  Future<User?> _getUserByEmail(String userEmail) async {
+    final userDoc = await _userCollection!.where('email', isNotEqualTo: _authService.user!.email, isEqualTo: userEmail).get();
+    if (userDoc.docs.isNotEmpty) return userDoc.docs.first.data();
+    return null;
+  }
 }
