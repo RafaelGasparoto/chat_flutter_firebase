@@ -2,6 +2,7 @@ import 'package:chat_flutter_firebase/models/user.dart';
 import 'package:chat_flutter_firebase/pages/request/components/friend_checkbox.dart';
 import 'package:chat_flutter_firebase/pages/request/components/label_divider.dart';
 import 'package:chat_flutter_firebase/pages/request/components/selected_friend.dart';
+import 'package:chat_flutter_firebase/pages/request/group_create.dart';
 import 'package:chat_flutter_firebase/services/database_service.dart';
 import 'package:chat_flutter_firebase/services/navigation_service.dart';
 import 'package:chat_flutter_firebase/widgets/custom_button.dart';
@@ -106,7 +107,12 @@ class _CreateGroupTabState extends State<CreateGroupTab> {
         child: CustomButton(
           label: 'Criar Grupo',
           onPressed: () {
-            _navigationService.pushNamed('/group-create');
+            _navigationService.pushRoute(
+              MaterialPageRoute(
+                builder: (context) {
+                  return GroupCreate(friends);
+                },
+            ));
           },
         ),
       ),

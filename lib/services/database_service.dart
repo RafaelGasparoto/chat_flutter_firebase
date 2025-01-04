@@ -56,9 +56,9 @@ class DatabaseService {
   Stream getStreamFriends() {
     return _userCollection!.doc(_authService.user!.uid).snapshots().asyncMap((user) async {
       final List<String>? friends = user.data()!.friends;
-      if(friends == null) return [];
+      if (friends == null) return [];
 
-      final List<DocumentSnapshot<User>> snapshots = await Future.wait(friends.map((friend) async => _userCollection!.doc(friend).get()).toList()); 
+      final List<DocumentSnapshot<User>> snapshots = await Future.wait(friends.map((friend) async => _userCollection!.doc(friend).get()).toList());
       return snapshots.map((user) => user.data()!).toList();
     });
   }
@@ -158,5 +158,23 @@ class DatabaseService {
     final userDoc = await _userCollection!.where('email', isNotEqualTo: _authService.user!.email, isEqualTo: userEmail).get();
     if (userDoc.docs.isNotEmpty) return userDoc.docs.first.data();
     return null;
+  }
+
+  Future<void> createGroup({required String groupName, required String groupDescription, required List<User> groupMembers}) async {
+    final chatRef = _chatCollection!.doc();
+    String groupId = chatRef.id;
+    for (User member in groupMembers) {
+      _userCollection!.doc(member.uid).update({
+        'groups': FieldValue.arrayUnion([groupId])
+      });
+    }
+
+    await chatRef.set(Chat(
+      id: groupId,
+      name: groupName,
+      description: groupDescription,
+      isGroup: true,
+      participants: groupMembers.map((user) => user.uid!).toList(),
+    ));
   }
 }
