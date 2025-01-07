@@ -53,6 +53,23 @@ class DatabaseService {
     return userDoc.exists ? userDoc.data() : null;
   }
 
+  Stream<List<Chat>> getStreamAvaliableChats() {
+    return _userCollection!.doc(_authService.user!.uid).snapshots().asyncMap((user) async {
+      final List<String> friends = user.data()?.friends ?? [];
+      final List<String> chats = user.data()?.groups ?? [];
+
+      for (String friend in friends) {
+        chats.add(generateId(uid1: _authService.user!.uid, uid2: friend));
+      }
+  
+      if(chats.isEmpty) return [];
+
+      final List<DocumentSnapshot<Chat>> snapshotChats = await Future.wait(chats.map((group) async => _chatCollection!.doc(group).get()).toList());
+
+      return snapshotChats.map((chat) => chat.data()!).toList();
+    });
+  }
+
   Stream getStreamFriends() {
     return _userCollection!.doc(_authService.user!.uid).snapshots().asyncMap((user) async {
       final List<String>? friends = user.data()!.friends;
@@ -63,9 +80,7 @@ class DatabaseService {
     });
   }
 
-  Stream<Message?> getLastMessage(String otherUserUid) {
-    final currentUserUid = _authService.user!.uid;
-    final chatId = generateId(uid1: currentUserUid, uid2: otherUserUid);
+  Stream<Message?> getLastMessage(String chatId) {
     return _chatCollection!.doc(chatId).collection('messages').orderBy('sentAt', descending: true).limit(1).snapshots().map((snapshot) {
       if (snapshot.docs.isNotEmpty) return Message.fromJson(snapshot.docs.first.data());
       return null;
@@ -78,10 +93,12 @@ class DatabaseService {
     return chat.exists;
   }
 
-  Future<void> createChat({required String currentUserUid, required String otherUserUid}) async {
+  Future<void> createChat({required String currentUserUid, required String otherUserUid, String? chatName}) async {
     final String chatId = generateId(uid1: currentUserUid, uid2: otherUserUid);
     final docRef = _chatCollection!.doc(chatId);
+
     final Chat chat = Chat(
+      name: chatName,
       id: chatId,
       participants: [currentUserUid, otherUserUid],
       messages: [],
@@ -122,11 +139,13 @@ class DatabaseService {
     }
   }
 
-  Future<void> acceptFriendRequest({required String senderId}) async {
+  Future<void> acceptFriendRequest({required String senderId, required String chatName}) async {
     try {
       final receiverId = _currentUserService.user!.uid;
 
       final FriendRequest friendRequest = await _friendRequestCollection!.doc(generateId(uid1: senderId, uid2: receiverId!)).get().then((value) => value.data()!);
+      
+      await createChat(currentUserUid: receiverId, otherUserUid: senderId);
 
       await _userCollection!.doc(friendRequest.senderId).update({
         'friends': FieldValue.arrayUnion([friendRequest.receiverId])
@@ -163,6 +182,7 @@ class DatabaseService {
   Future<void> createGroup({required String groupName, required String groupDescription, required List<User> groupMembers}) async {
     final chatRef = _chatCollection!.doc();
     String groupId = chatRef.id;
+    groupMembers.add(_currentUserService.user!);
     for (User member in groupMembers) {
       _userCollection!.doc(member.uid).update({
         'groups': FieldValue.arrayUnion([groupId])
@@ -176,5 +196,9 @@ class DatabaseService {
       isGroup: true,
       participants: groupMembers.map((user) => user.uid!).toList(),
     ));
+  }
+
+  Stream<List<User>> getStreamChatUsers(List<String> users) {
+    return _userCollection!.where('uid', whereIn: users).snapshots().map((snapshot) => snapshot.docs.map((user) => user.data()).toList());
   }
 }

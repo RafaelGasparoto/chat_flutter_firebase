@@ -83,7 +83,7 @@ class _HomePageState extends State<HomePage> {
 
   Widget _listChats() {
     return StreamBuilder(
-      stream: _databaseService.getStreamFriends(),
+      stream: _databaseService.getStreamAvaliableChats(),
       builder: (context, snapshot) {
         if (snapshot.hasError) {
           return const Text('Erro ao buscar usuários');

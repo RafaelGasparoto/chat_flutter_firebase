@@ -96,7 +96,7 @@ class _FriendRequestTabState extends State<FriendRequestTab> {
                         icon: const Icon(Icons.check),
                         color: const Color.fromARGB(255, 101, 234, 105),
                         onPressed: () {
-                          _databaseService.acceptFriendRequest(senderId: friendRequest.senderId!);
+                          _databaseService.acceptFriendRequest(senderId: friendRequest.senderId!, chatName: friendRequest.senderName!);
                         },
                       ),
                     ],
