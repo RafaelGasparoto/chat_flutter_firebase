@@ -35,6 +35,10 @@ class MyApp extends StatelessWidget {
           secondary: const Color(0XFF2C2F33),
         ),
         useMaterial3: false,
+        floatingActionButtonTheme: const FloatingActionButtonThemeData(
+          backgroundColor: Color(0XFF2C2F33),
+          foregroundColor: Colors.white,
+        ),
         appBarTheme: const AppBarTheme(
           backgroundColor: Color(0XFF2C2F33), 
           titleTextStyle: TextStyle(
@@ -43,7 +47,10 @@ class MyApp extends StatelessWidget {
             fontWeight: FontWeight.bold
           ),
         ),
-        dividerColor: const Color(0XFF99AAB5),
+        dividerTheme: const DividerThemeData(
+          color: Color(0XFF99AAB5),
+          thickness: 0.5
+        )
       ),
     );
   }
