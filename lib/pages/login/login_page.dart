@@ -34,80 +34,88 @@ class _LoginPageState extends State<LoginPage> {
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: Stack(
-            children: [
-              _formLogin(),
-              _registerUser(),
-            ],
+          child: LayoutBuilder(
+            builder: (context, constraints) => SingleChildScrollView(
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  minHeight: constraints.maxHeight,
+                ),
+                child: Column(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+                  _logo(),
+                  _formLogin(),
+                  _registerUser(),
+                ]),
+              ),
+            ),
           ),
         ),
       ),
     );
   }
 
+  Widget _logo() {
+    return const Image(
+      image: AssetImage('assets/icon/chat-icon.png'),
+      height: 200,
+    );
+  }
+
   Widget _formLogin() {
-    return Center(
-      child: Form(
-        key: _formKey,
-        autovalidateMode: AutovalidateMode.onUserInteraction,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            CustomFormField(
-              labelText: 'E-mail',
-              onSaved: (email) {
-                _email = email;
-              },
-              padding: const EdgeInsets.only(bottom: 10),
-              keyboardType: TextInputType.emailAddress,
-              validator: (email) {
-                if(email != null && !emailRegex.hasMatch(email)) return 'E-mail inválido';
-                return null;
-              },
-            ),
-            CustomFormField(
-              labelText: 'Senha',
-              onSaved: (password) {
-                _password = password;
-              },
-              keyboardType: TextInputType.visiblePassword,
-              obscureText: true,
-            ),
-            const SizedBox(
-              height: 20,
-            ),
-            CustomButton(
-              label: 'Login',
-              onPressed: () async {
-                if (_formKey.currentState!.validate()) {
-                  _formKey.currentState!.save();
-                  final result = await _authService.login(_email!, _password!);
-                  if (result) {
-                    _navigationService.replaceToNamed('/home');
-                  }
+    return Form(
+      key: _formKey,
+      autovalidateMode: AutovalidateMode.onUserInteraction,
+      child: Column(
+        children: [
+          CustomFormField(
+            labelText: 'E-mail',
+            onSaved: (email) {
+              _email = email;
+            },
+            padding: const EdgeInsets.only(bottom: 10),
+            keyboardType: TextInputType.emailAddress,
+            validator: (email) {
+              if (email != null && !emailRegex.hasMatch(email)) return 'E-mail inválido';
+              return null;
+            },
+          ),
+          CustomFormField(
+            labelText: 'Senha',
+            onSaved: (password) {
+              _password = password;
+            },
+            keyboardType: TextInputType.visiblePassword,
+            obscureText: true,
+          ),
+          const SizedBox(
+            height: 20,
+          ),
+          CustomButton(
+            label: 'Login',
+            onPressed: () async {
+              if (_formKey.currentState!.validate()) {
+                _formKey.currentState!.save();
+                final result = await _authService.login(_email!, _password!);
+                if (result) {
+                  _navigationService.replaceToNamed('/home');
                 }
-              },
-            ),
-          ],
-        ),
+              }
+            },
+          ),
+        ],
       ),
     );
   }
 
   Widget _registerUser() {
-    return Align(
-      alignment: Alignment.bottomCenter,
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          const Text('Não possui uma conta? '),
-          TextButton(
-            onPressed: () => _navigationService.pushNamed('/register'),
-            child: const Text('Cadastre-se'),
-          ),
-        ],
-      ),
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.end,
+      children: [
+        const Text('Não possui uma conta? '),
+        TextButton(
+          onPressed: () => _navigationService.pushNamed('/register'),
+          child: const Text('Cadastre-se'),
+        ),
+      ],
     );
   }
 }
