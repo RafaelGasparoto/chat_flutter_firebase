@@ -4,6 +4,7 @@ import 'package:chat_flutter_firebase/services/current_user_service.dart';
 import 'package:chat_flutter_firebase/services/database_service.dart';
 import 'package:chat_flutter_firebase/services/navigation_service.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get_connect/http/src/utils/utils.dart';
 import 'package:get_it/get_it.dart';
 
 class HomePage extends StatefulWidget {
@@ -54,6 +55,16 @@ class _HomePageState extends State<HomePage> {
 
   AppBar _appBar() {
     return AppBar(
+      title: const Row(
+        children: [
+          Image(
+            image: AssetImage('assets/icon/chat-icon.png'),
+            height: 40,
+            color: Colors.white,
+          ),
+          Expanded(child: Text('Flutter Firebase Chat')),
+        ],
+      ),
       actions: [
         IconButton(
           icon: const Icon(Icons.logout),
