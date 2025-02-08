@@ -1,5 +1,6 @@
 import 'package:chat_flutter_firebase/services/auth_service.dart';
 import 'package:chat_flutter_firebase/services/navigation_service.dart';
+import 'package:chat_flutter_firebase/services/notification_service.dart';
 import 'package:chat_flutter_firebase/utils/firebase_setup.dart';
 import 'package:chat_flutter_firebase/utils/register_services.dart';
 import 'package:flutter/material.dart';
@@ -23,6 +24,11 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     final NavigationService navigationService = GetIt.instance.get<NavigationService>();
     final AuthService authService = GetIt.instance.get<AuthService>();
+    final NotificationService notificationService = GetIt.instance.get<NotificationService>();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      notificationService.onMessage();
+    });
 
     return MaterialApp(
       debugShowCheckedModeBanner: false,
@@ -31,27 +37,19 @@ class MyApp extends StatelessWidget {
       initialRoute: authService.user != null ? '/home' : '/login',
       title: 'Chat Flutter Firebase',
       theme: ThemeData(
-        colorScheme: const ColorScheme.light().copyWith(
-          secondary: const Color(0XFF2C2F33),
-        ),
-        useMaterial3: false,
-        floatingActionButtonTheme: const FloatingActionButtonThemeData(
-          backgroundColor: Color(0XFF2C2F33),
-          foregroundColor: Colors.white,
-        ),
-        appBarTheme: const AppBarTheme(
-          backgroundColor: Color(0XFF2C2F33), 
-          titleTextStyle: TextStyle(
-            color: Colors.white,
-            fontSize: 20,
-            fontWeight: FontWeight.bold
+          colorScheme: const ColorScheme.light().copyWith(
+            secondary: const Color(0XFF2C2F33),
           ),
-        ),
-        dividerTheme: const DividerThemeData(
-          color: Color(0XFF99AAB5),
-          thickness: 0.5
-        )
-      ),
+          useMaterial3: false,
+          floatingActionButtonTheme: const FloatingActionButtonThemeData(
+            backgroundColor: Color(0XFF2C2F33),
+            foregroundColor: Colors.white,
+          ),
+          appBarTheme: const AppBarTheme(
+            backgroundColor: Color(0XFF2C2F33),
+            titleTextStyle: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
+          ),
+          dividerTheme: const DividerThemeData(color: Color(0XFF99AAB5), thickness: 0.5)),
     );
   }
 }
