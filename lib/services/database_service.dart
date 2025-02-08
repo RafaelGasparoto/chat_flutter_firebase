@@ -205,4 +205,6 @@ class DatabaseService {
   Stream<List<User>> getStreamChatUsers(List<String> users) {
     return _userCollection!.where('uid', whereIn: users).snapshots().map((snapshot) => snapshot.docs.map((user) => user.data()).toList());
   }
+
+  Stream<Chat> getStreamChat(String chatId) => _chatCollection!.doc(chatId).snapshots().map((snapshot) => snapshot.data()!);
 }
