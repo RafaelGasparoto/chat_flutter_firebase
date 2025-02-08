@@ -3,8 +3,8 @@ import 'package:chat_flutter_firebase/services/auth_service.dart';
 import 'package:chat_flutter_firebase/services/current_user_service.dart';
 import 'package:chat_flutter_firebase/services/database_service.dart';
 import 'package:chat_flutter_firebase/services/navigation_service.dart';
+import 'package:chat_flutter_firebase/services/notification_service.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get_connect/http/src/utils/utils.dart';
 import 'package:get_it/get_it.dart';
 
 class HomePage extends StatefulWidget {
@@ -20,12 +20,14 @@ class _HomePageState extends State<HomePage> {
   late final NavigationService _navigationService;
   late final DatabaseService _databaseService;
   late final CurrentUserService _currentUser;
+  late final NotificationService _notificationService;
 
   @override
   void initState() {
     _authService = GetIt.instance.get<AuthService>();
     _navigationService = GetIt.instance.get<NavigationService>();
     _databaseService = GetIt.instance.get<DatabaseService>();
+    _notificationService = GetIt.instance.get<NotificationService>();
     _getCurrentUser();
     super.initState();
   }
@@ -33,6 +35,7 @@ class _HomePageState extends State<HomePage> {
   Future<void> _getCurrentUser() async {
     _currentUser = getIt.get<CurrentUserService>();
     _currentUser.user = await _databaseService.getUser(_authService.user!.uid);
+    _notificationService.setFmcToken();
   }
 
   @override

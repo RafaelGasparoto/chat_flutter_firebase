@@ -48,6 +48,10 @@ class DatabaseService {
     }
   }
 
+  void setFcmToken(String fcmToken) {
+     _userCollection!.doc(_authService.user!.uid).update({'fcmToken': fcmToken});   
+  }
+
   Future<User?> getUser(String userId) async {
     final userDoc = await _userCollection!.doc(userId).get();
     return userDoc.exists ? userDoc.data() : null;
