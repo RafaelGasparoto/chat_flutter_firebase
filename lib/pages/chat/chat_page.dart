@@ -2,6 +2,7 @@ import 'package:chat_flutter_firebase/models/chat.dart';
 import 'package:chat_flutter_firebase/models/message.dart';
 import 'package:chat_flutter_firebase/models/user.dart';
 import 'package:chat_flutter_firebase/services/auth_service.dart';
+import 'package:chat_flutter_firebase/services/current_user_service.dart';
 import 'package:chat_flutter_firebase/services/database_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -9,9 +10,7 @@ import 'package:dash_chat_2/dash_chat_2.dart';
 import 'package:get_it/get_it.dart';
 
 class ChatPage extends StatefulWidget {
-  const ChatPage(this.chat, {super.key});
-
-  final Chat chat;
+  const ChatPage({super.key});
 
   @override
   State<ChatPage> createState() => _ChatPageState();
@@ -22,72 +21,84 @@ class _ChatPageState extends State<ChatPage> {
   late final List<ChatUser> _chatUsers = [];
   late final AuthService _authService;
   late final DatabaseService _databaseService;
-  late final String _chatId;
+  late final CurrentUserService _currentUserService;
+  late String _chatId;
 
   @override
   void initState() {
     _authService = _getIt.get<AuthService>();
     _databaseService = _getIt.get<DatabaseService>();
-    _chatId = widget.chat.id!;
+    _currentUserService = _getIt.get<CurrentUserService>();
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Row(
-          children: [
-            const CircleAvatar(backgroundImage: NetworkImage('https://i.pravatar.cc/300')),
-            Padding(padding: const EdgeInsets.only(left: 10), child: Text(widget.chat.name ?? '')),
-          ],
-        ),
-      ),
-      body: StreamBuilder(
-        stream: _databaseService.getStreamChatUsers(widget.chat.participants!),
-        builder: (_, snapshotUsers) {
-          if (snapshotUsers.hasError) {
-            return const Text('Erro ao buscar usuários');
-          }
+    _chatId = (ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>)['chatId']!;
 
-          if (snapshotUsers.hasData && snapshotUsers.data != null) {
-            
-            for (User user in snapshotUsers.data!) {
-              _chatUsers.add(ChatUser(id: user.uid!, firstName: user.name));
-            }
+    return StreamBuilder<Object>(
+      stream: _databaseService.getStreamChat(_chatId),
+      builder: (context, snapshot) {
+        if(snapshot.connectionState == ConnectionState.waiting) return const Center(child: CircularProgressIndicator());
 
-            return StreamBuilder(
-              stream: _databaseService.getStreamMessages(_chatId),
-              builder: (context, snapshot) {
-                if (snapshot.hasError) {
-                  return const Text('Erro ao buscar chat');
+        if(snapshot.hasError) return const Text('Erro ao buscar chat');
+
+        Chat chat = snapshot.data as Chat;
+        return Scaffold(
+          appBar: AppBar(
+            title: Row(
+              children: [
+                const CircleAvatar(backgroundImage: NetworkImage('https://i.pravatar.cc/300')),
+                Padding(padding: const EdgeInsets.only(left: 10), child: Text(chat.name ?? '')),
+              ],
+            ),
+          ),
+          body: StreamBuilder(
+            stream: _databaseService.getStreamChatUsers(chat.participants!),
+            builder: (_, snapshotUsers) {
+              if (snapshotUsers.hasError) {
+                return const Text('Erro ao buscar usuários');
+              }
+        
+              if (snapshotUsers.hasData && snapshotUsers.data != null) {
+                for (User user in snapshotUsers.data!) {
+                  _chatUsers.add(ChatUser(id: user.uid!, firstName: user.name));
                 }
-
-                if (snapshot.hasData && snapshot.data != null) {
-                  List<Message> message = snapshot.data!;
-                  List<ChatMessage> chatMessages = _generateMessages(message);
-
-                  return DashChat(
-                    messageOptions: const MessageOptions(
-                      showTime: true,
-                      containerColor: Color(0XFF2C2F33),
-                      textColor: Colors.white,
-                      currentUserTextColor: Colors.white,
-                    ),
-                    currentUser: _chatUsers.firstWhere((user) => user.id == _authService.user!.uid),
-                    onSend: (ChatMessage message) => _sendMessage(message),
-                    messages: chatMessages,
-                  );
-                }
-
-                return const Center(child: CircularProgressIndicator());
-              },
-            );
-          }
-
-          return const Center(child: CircularProgressIndicator());
-        },
-      ),
+        
+                return StreamBuilder(
+                  stream: _databaseService.getStreamMessages(_chatId),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasError) {
+                      return const Text('Erro ao buscar chat');
+                    }
+        
+                    if (snapshot.hasData && snapshot.data != null) {
+                      List<Message> message = snapshot.data!;
+                      List<ChatMessage> chatMessages = _generateMessages(message);
+        
+                      return DashChat(
+                        messageOptions: const MessageOptions(
+                          showTime: true,
+                          containerColor: Color(0XFF2C2F33),
+                          textColor: Colors.white,
+                          currentUserTextColor: Colors.white,
+                        ),
+                        currentUser: _chatUsers.firstWhere((user) => user.id == _authService.user!.uid),
+                        onSend: (ChatMessage message) => _sendMessage(message),
+                        messages: chatMessages,
+                      );
+                    }
+        
+                    return const Center(child: CircularProgressIndicator());
+                  },
+                );
+              }
+        
+              return const Center(child: CircularProgressIndicator());
+            },
+          ),
+        );
+      }
     );
   }
 
