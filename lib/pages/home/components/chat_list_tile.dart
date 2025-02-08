@@ -1,6 +1,5 @@
 import 'package:chat_flutter_firebase/models/chat.dart';
 import 'package:chat_flutter_firebase/models/message.dart';
-import 'package:chat_flutter_firebase/pages/chat/chat_page.dart';
 import 'package:chat_flutter_firebase/services/auth_service.dart';
 import 'package:chat_flutter_firebase/services/database_service.dart';
 import 'package:chat_flutter_firebase/services/navigation_service.dart';
@@ -54,13 +53,6 @@ class ChatListTile extends StatelessWidget {
 
   Future<void> onTapChat(GetIt getIt) async {
     final NavigationService navigationService = getIt.get<NavigationService>();
-
-    navigationService.pushRoute(
-      MaterialPageRoute(
-        builder: (context) {
-          return ChatPage(chat);
-        },
-      ),
-    );
+    navigationService.pushNamed('/chat', arguments: {'chatId': chat.id});
   }
 }
