@@ -10,10 +10,11 @@ class Message {
   String? senderId;
   String? content;
   MessageType? messageType;
+  String? senderName;
   @TimestampConverter()
   Timestamp? sentAt;
 
-  Message({this.senderId, this.content, this.messageType, this.sentAt});
+  Message({this.senderId, this.senderName, this.content, this.messageType, this.sentAt});
 
   factory Message.fromJson(Map<String, dynamic> json) => _$MessageFromJson(json);
   Map<String, dynamic> toJson() => _$MessageToJson(this);

@@ -95,6 +95,7 @@ class _ChatPageState extends State<ChatPage> {
     final Message message = Message(
       senderId: _chatUsers.firstWhere((user) => user.id == _authService.user!.uid).id,
       content: chatMessage.text,
+      senderName: _currentUserService.user!.name,
       messageType: MessageType.Text,
       sentAt: Timestamp.fromDate(chatMessage.createdAt),
     );
