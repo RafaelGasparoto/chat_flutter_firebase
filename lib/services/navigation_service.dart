@@ -1,3 +1,4 @@
+import 'package:chat_flutter_firebase/pages/chat/chat_page.dart';
 import 'package:chat_flutter_firebase/pages/request/request_page.dart';
 import 'package:chat_flutter_firebase/pages/home/home_page.dart';
 import 'package:chat_flutter_firebase/pages/login/login_page.dart';
@@ -14,13 +15,14 @@ class NavigationService {
     '/home': (_) => const HomePage(),
     '/register': (_) => const RegisterPage(),
     '/request': (_) => const RequestPage(),
+    '/chat': (_) => const ChatPage(),
   };
 
   void pushRoute(MaterialPageRoute route) {
     _navigatorKey.currentState!.push(route);
   }
 
-  void pushNamed(String routeName) => _navigatorKey.currentState!.pushNamed(routeName);
+  void pushNamed(String routeName, {Object? arguments}) => _navigatorKey.currentState!.pushNamed(routeName, arguments: arguments);
 
   void replaceToNamed(String routeName) => _navigatorKey.currentState!.pushReplacementNamed(routeName);
 
