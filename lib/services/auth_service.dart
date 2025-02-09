@@ -49,7 +49,6 @@ class AuthService {
       UserCredential userCredential = await _firebaseAuth.createUserWithEmailAndPassword(email: email, password: password);
       if (userCredential.user != null) {
         _user = userCredential.user;
-        _snackbarService.snackBarSucess(message: 'Cadastro realizado com sucesso.');
         return true;
       }
     } on FirebaseAuthException catch (e) {

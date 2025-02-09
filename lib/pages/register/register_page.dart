@@ -5,6 +5,7 @@ import 'package:chat_flutter_firebase/services/auth_service.dart';
 import 'package:chat_flutter_firebase/services/database_service.dart';
 import 'package:chat_flutter_firebase/services/media_service.dart';
 import 'package:chat_flutter_firebase/services/navigation_service.dart';
+import 'package:chat_flutter_firebase/services/snackbar_service.dart';
 import 'package:chat_flutter_firebase/utils/regex.dart';
 import 'package:chat_flutter_firebase/widgets/custom_button.dart';
 import 'package:chat_flutter_firebase/widgets/custom_form_field.dart';
@@ -24,6 +25,7 @@ class _RegisterPageState extends State<RegisterPage> {
   late final AuthService _authService;
   late final MediaService _mediaService;
   late final DatabaseService _databaseService;
+  late final SnackbarService _snackbarService;
 
   final _formKey = GlobalKey<FormState>();
   String? _name;
@@ -37,6 +39,7 @@ class _RegisterPageState extends State<RegisterPage> {
     _authService = _getIt.get<AuthService>();
     _mediaService = _getIt.get<MediaService>();
     _databaseService = _getIt.get<DatabaseService>();
+    _snackbarService = _getIt.get<SnackbarService>();
     super.initState();
   }
 
@@ -166,14 +169,20 @@ class _RegisterPageState extends State<RegisterPage> {
       _formKey.currentState!.save();
       final result = await _authService.singUp(email: _email!, password: _password!);
       if (result) {
+        final urlProfilePicture = _selectedImage == null ? '' : await _mediaService.uploadProfilePicture(_selectedImage!, _authService.user!.uid);
+
         _databaseService.createUser(
           user: User(
             uid: _authService.user!.uid,
             email: _email!,
             name: _name!,
+            profilePicture: urlProfilePicture,
           ),
         );
+        
         _navigationService.goBack();
+
+        _snackbarService.snackBarSucess(message: 'Cadastro realizado com sucesso!');
       }
     }
   }
