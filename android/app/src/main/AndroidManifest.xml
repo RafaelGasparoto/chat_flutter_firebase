@@ -1,4 +1,5 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.example.chat_flutter_firebase">
     <application
         android:label="Chat"
         android:name="${applicationName}"
