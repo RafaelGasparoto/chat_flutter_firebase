@@ -1,5 +1,5 @@
 import 'dart:io';
-
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:image_picker/image_picker.dart';
 
 class MediaService {
@@ -11,7 +11,23 @@ class MediaService {
     if (image != null) {
       return File(image.path);
     }
-    
+
     return null;
+  }
+
+  Future<String> uploadProfilePicture(File image, String userUid) async {
+    final storage = FirebaseStorage.instance;
+    final ref = storage.ref().child('profile_pictures/$userUid');
+
+    final uploadTask = ref.putFile(image);
+    late String url;
+
+    await uploadTask.whenComplete(() async {
+      await ref.getDownloadURL().then((value) {
+        url = value;
+      });
+    });
+
+    return url;
   }
 }
