@@ -20,6 +20,7 @@ class _HomePageState extends State<HomePage> {
   late final AuthService _authService;
   late final NavigationService _navigationService;
   late final DatabaseService _databaseService;
+  late final CurrentUserService _currentUserService;
   late final NotificationService _notificationService;
 
   @override
@@ -28,11 +29,10 @@ class _HomePageState extends State<HomePage> {
     _navigationService = GetIt.instance.get<NavigationService>();
     _databaseService = GetIt.instance.get<DatabaseService>();
     _notificationService = GetIt.instance.get<NotificationService>();
+    _currentUserService = GetIt.instance.get<CurrentUserService>();
     _notificationService.setFmcToken();
     super.initState();
   }
-
-  Future<void> _getCurrentUser() async => await _databaseService.getUser(_authService.user!.uid);
 
   @override
   Widget build(BuildContext context) {
@@ -54,39 +54,29 @@ class _HomePageState extends State<HomePage> {
 
   AppBar _appBar() {
     return AppBar(
-      title: FutureBuilder(
-          future: _getCurrentUser(),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(child: CircularProgressIndicator());
-            }
-
-            if (snapshot.hasError) {
-              return const Text('Erro ao buscar usuário');
-            }
-
-            final currentUser = snapshot.data as User;
-
-            return GestureDetector(
-              onTap: () => _navigationService.pushNamed('/profile', arguments: currentUser),
-              child: Row(
-                children: [
-                  currentUser.profilePicture == null
-                      ? CircleAvatar(
-                          backgroundImage: const AssetImage('assets/user.png'),
-                          backgroundColor: Colors.grey.shade300,
-                        )
-                      : CircleAvatar(backgroundImage: NetworkImage(currentUser.profilePicture!)),
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.only(left: 15),
-                      child: Text(currentUser.name ?? '', style: const TextStyle(fontWeight: FontWeight.bold)),
-                    ),
-                  ),
-                ],
+      title: GestureDetector(
+        onTap: () async => await _navigationService.pushNamed('/profile', arguments: _currentUserService.user).then((value) {
+          setState(() {
+            _currentUserService.user = value as User;
+          });
+        }),
+        child: Row(
+          children: [
+            _currentUserService.user!.profilePicture == null
+                ? CircleAvatar(
+                    backgroundImage: const AssetImage('assets/user.png'),
+                    backgroundColor: Colors.grey.shade300,
+                  )
+                : CircleAvatar(backgroundImage: NetworkImage(_currentUserService.user!.profilePicture!)),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.only(left: 15),
+                child: Text(_currentUserService.user!.name ?? '', style: const TextStyle(fontWeight: FontWeight.bold)),
               ),
-            );
-          }),
+            ),
+          ],
+        ),
+      ),
       actions: [
         IconButton(
           icon: const Icon(Icons.logout),
