@@ -9,6 +9,7 @@ import 'package:chat_flutter_firebase/services/snackbar_service.dart';
 import 'package:chat_flutter_firebase/utils/regex.dart';
 import 'package:chat_flutter_firebase/widgets/custom_button.dart';
 import 'package:chat_flutter_firebase/widgets/custom_form_field.dart';
+import 'package:chat_flutter_firebase/widgets/profile_picture.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 
@@ -31,7 +32,7 @@ class _RegisterPageState extends State<RegisterPage> {
   String? _name;
   String? _email;
   String? _password;
-  File? _selectedImage;
+  File? _selectedPicture;
 
   @override
   void initState() {
@@ -56,6 +57,11 @@ class _RegisterPageState extends State<RegisterPage> {
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   _profilePicture(),
+                  ProfilePicture(
+                    onSelectPicture: (File picture) {
+                      _selectedPicture = picture;
+                    },
+                  ),
                   _formSingUp(),
                 ],
               ),
@@ -75,14 +81,14 @@ class _RegisterPageState extends State<RegisterPage> {
 
           if (selectedImage != null) {
             setState(() {
-              _selectedImage = selectedImage;
+              _selectedPicture = selectedImage;
             });
           }
         },
         child: CircleAvatar(
           backgroundColor: Colors.grey.shade100,
           radius: 60,
-          backgroundImage: _selectedImage != null ? FileImage(_selectedImage!) : const AssetImage('assets/user.png'),
+          backgroundImage: _selectedPicture != null ? FileImage(_selectedPicture!) : const AssetImage('assets/user.png'),
           child: Align(
             alignment: Alignment.bottomRight,
             child: Container(
@@ -169,7 +175,7 @@ class _RegisterPageState extends State<RegisterPage> {
       _formKey.currentState!.save();
       final result = await _authService.singUp(email: _email!, password: _password!);
       if (result) {
-        final urlProfilePicture = _selectedImage == null ? '' : await _mediaService.uploadProfilePicture(_selectedImage!, _authService.user!.uid);
+        final urlProfilePicture = _selectedPicture == null ? '' : await _mediaService.uploadProfilePicture(_selectedPicture!, _authService.user!.uid);
 
         _databaseService.createUser(
           user: User(
@@ -179,7 +185,7 @@ class _RegisterPageState extends State<RegisterPage> {
             profilePicture: urlProfilePicture,
           ),
         );
-        
+
         _navigationService.goBack();
 
         _snackbarService.snackBarSucess(message: 'Cadastro realizado com sucesso!');
