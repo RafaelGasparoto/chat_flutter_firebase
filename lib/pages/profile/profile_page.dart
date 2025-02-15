@@ -32,15 +32,16 @@ class _ProfilePageState extends State<ProfilePage> {
 
     return PopScope(
       canPop: false,
-      onPopInvokedWithResult: (didPop, result) {
+      onPopInvokedWithResult: (didPop, result) async {
         if (didPop) return;
+        
         if (_selectedPicture != null) {
           _mediaService.uploadProfilePicture(_selectedPicture!, user!.uid!).then((url) {
-            user!.profilePicture = url;
-            _getIt.get<DatabaseService>().updateProfilePictureUrl(user!.profilePicture ?? '');
+            _getIt.get<DatabaseService>().updateProfilePictureUrl(url);
           });
         }
-        Navigator.pop(context, user);
+
+        Navigator.pop(context);
       },
       child: Scaffold(
         appBar: AppBar(title: const Text('Perfil')),
@@ -48,6 +49,7 @@ class _ProfilePageState extends State<ProfilePage> {
           child: Column(
             children: [
               ProfilePicture(
+                profilePictureUrl: user?.profilePicture,
                 onSelectPicture: (File picture) {
                   _selectedPicture = picture;
                 },

@@ -55,26 +55,31 @@ class _HomePageState extends State<HomePage> {
   AppBar _appBar() {
     return AppBar(
       title: GestureDetector(
-        onTap: () async => await _navigationService.pushNamed('/profile', arguments: _currentUserService.user).then((value) {
-          setState(() {
-            _currentUserService.user = value as User;
-          });
-        }),
-        child: Row(
-          children: [
-            _currentUserService.user!.profilePicture == null
-                ? CircleAvatar(
-                    backgroundImage: const AssetImage('assets/user.png'),
-                    backgroundColor: Colors.grey.shade300,
-                  )
-                : CircleAvatar(backgroundImage: NetworkImage(_currentUserService.user!.profilePicture!)),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.only(left: 15),
-                child: Text(_currentUserService.user!.name ?? '', style: const TextStyle(fontWeight: FontWeight.bold)),
-              ),
-            ),
-          ],
+        onTap: () async => await _navigationService.pushNamed('/profile', arguments: _currentUserService.user),
+        child: StreamBuilder<User?>(
+          stream: _databaseService.getUserStream(),
+          builder: (context, snapshot) {
+            if (snapshot.hasError) return const Text('Erro ao buscar usuário');
+            
+            if(snapshot.hasData && snapshot.data != null) _currentUserService.user = snapshot.data!;
+
+            return Row(
+              children: [
+                _currentUserService.user!.profilePicture == null
+                    ? CircleAvatar(
+                        backgroundImage: const AssetImage('assets/user.png'),
+                        backgroundColor: Colors.grey.shade300,
+                      )
+                    : CircleAvatar(backgroundImage: NetworkImage(_currentUserService.user!.profilePicture!)),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 15),
+                    child: Text(_currentUserService.user!.name ?? '', style: const TextStyle(fontWeight: FontWeight.bold)),
+                  ),
+                ),
+              ],
+            );
+          }
         ),
       ),
       actions: [

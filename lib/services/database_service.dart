@@ -62,6 +62,8 @@ class DatabaseService {
     return userDoc.exists ? userDoc.data() : null;
   }
 
+  Stream<User?> getUserStream() => _userCollection!.doc(_authService.user!.uid).snapshots().map((user) => user.data());
+
   Stream<List<Chat>> getStreamAvaliableChats() {
     return _userCollection!.doc(_authService.user!.uid).snapshots().asyncMap((user) async {
       final List<String> friends = user.data()?.friends ?? [];
