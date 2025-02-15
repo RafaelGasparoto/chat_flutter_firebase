@@ -1,4 +1,6 @@
 import 'package:chat_flutter_firebase/services/auth_service.dart';
+import 'package:chat_flutter_firebase/services/current_user_service.dart';
+import 'package:chat_flutter_firebase/services/database_service.dart';
 import 'package:chat_flutter_firebase/services/navigation_service.dart';
 import 'package:chat_flutter_firebase/utils/regex.dart';
 import 'package:chat_flutter_firebase/widgets/custom_button.dart';
@@ -96,6 +98,7 @@ class _LoginPageState extends State<LoginPage> {
                 _formKey.currentState!.save();
                 final result = await _authService.login(_email!, _password!);
                 if (result) {
+                  _getIt.get<CurrentUserService>().user = await _getIt.get<DatabaseService>().getUser(_authService.user!.uid);
                   _navigationService.replaceToNamed('/home');
                 }
               }
