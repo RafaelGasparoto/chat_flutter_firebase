@@ -48,6 +48,11 @@ class DatabaseService {
     }
   }
 
+  void updateProfilePictureUrl(String? profilePictureUrl) {
+    _currentUserService.user!.profilePicture = profilePictureUrl;
+    _userCollection!.doc(_authService.user!.uid).update({'profilePicture': profilePictureUrl});
+  }
+
   void setFcmToken(String fcmToken) {
      _userCollection!.doc(_authService.user!.uid).update({'fcmToken': fcmToken});   
   }

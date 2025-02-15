@@ -1,4 +1,5 @@
 import 'package:chat_flutter_firebase/pages/chat/chat_page.dart';
+import 'package:chat_flutter_firebase/pages/profile/profile_page.dart';
 import 'package:chat_flutter_firebase/pages/request/request_page.dart';
 import 'package:chat_flutter_firebase/pages/home/home_page.dart';
 import 'package:chat_flutter_firebase/pages/login/login_page.dart';
@@ -17,6 +18,7 @@ class NavigationService {
     '/register': (_) => const RegisterPage(),
     '/request': (_) => const RequestPage(),
     '/chat': (_) => const ChatPage(),
+    '/profile': (_) => const ProfilePage(),
     '/splashPage': (_) => const SplashPage(),
   };
 
@@ -24,7 +26,7 @@ class NavigationService {
     _navigatorKey.currentState!.push(route);
   }
 
-  void pushNamed(String routeName, {Object? arguments}) => _navigatorKey.currentState!.pushNamed(routeName, arguments: arguments);
+  Future<dynamic> pushNamed(String routeName, {Object? arguments}) async => await _navigatorKey.currentState!.pushNamed(routeName, arguments: arguments).then((result) => result);
 
   void replaceToNamed(String routeName) => _navigatorKey.currentState!.pushReplacementNamed(routeName);
 
