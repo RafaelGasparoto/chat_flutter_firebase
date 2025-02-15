@@ -58,6 +58,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 children: [
                   _profilePicture(),
                   ProfilePicture(
+                    profilePictureUrl: null,
                     onSelectPicture: (File picture) {
                       _selectedPicture = picture;
                     },
