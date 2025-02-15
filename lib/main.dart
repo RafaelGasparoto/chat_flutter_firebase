@@ -1,4 +1,3 @@
-import 'package:chat_flutter_firebase/services/auth_service.dart';
 import 'package:chat_flutter_firebase/services/navigation_service.dart';
 import 'package:chat_flutter_firebase/services/notification_service.dart';
 import 'package:chat_flutter_firebase/utils/firebase_setup.dart';
@@ -23,7 +22,6 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final NavigationService navigationService = GetIt.instance.get<NavigationService>();
-    final AuthService authService = GetIt.instance.get<AuthService>();
     final NotificationService notificationService = GetIt.instance.get<NotificationService>();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -34,7 +32,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       navigatorKey: navigationService.navigatorKey,
       routes: navigationService.routes,
-      initialRoute: authService.user != null ? '/home' : '/login',
+      initialRoute: '/splashPage',
       title: 'Chat Flutter Firebase',
       theme: ThemeData(
           colorScheme: const ColorScheme.light().copyWith(
